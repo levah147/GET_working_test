@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Register Transport Company - Government Transport Enterprise{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded shadow-md">
+    <h1 class="text-2xl font-bold mb-6 text-green-700">Register Transport Company</h1>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="mb-4">
+            <h2 class="text-xl font-semibold mb-2">Account Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Username</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">Password</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <h2 class="text-xl font-semibold mb-2">Company Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="{{ form.company_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Company Name</label>
+                    {{ form.company_name }}
+                    {% if form.company_name.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.company_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.registration_number.id_for_label }}" class="block text-sm font-medium text-gray-700">Registration Number</label>
+                    {{ form.registration_number }}
+                    {% if form.registration_number.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.registration_number.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div class="md:col-span-2">
+                    <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-gray-700">Address</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.address.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.contact_person.id_for_label }}" class="block text-sm font-medium text-gray-700">Contact Person</label>
+                    {{ form.contact_person }}
+                    {% if form.contact_person.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.contact_person.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.contact_phone.id_for_label }}" class="block text-sm font-medium text-gray-700">Contact Phone</label>
+                    {{ form.contact_phone }}
+                    {% if form.contact_phone.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.contact_phone.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div class="md:col-span-2">
+                    <label for="{{ form.logo.id_for_label }}" class="block text-sm font-medium text-gray-700">Company Logo</label>
+                    {{ form.logo }}
+                    {% if form.logo.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.logo.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6">
+            <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Register</button>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <p>Already have an account? <a href="{% url 'login' %}" class="text-green-600 hover:underline">Login</a></p>
+        </div>
+    </form>
+</div>
+{% endblock %}

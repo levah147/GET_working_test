@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Passenger to Trip | Government Transport Enterprise{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <!-- Breadcrumb navigation -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'trip_list' %}">Trips</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'trip_detail' pk=trip.id %}">Trip Details</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Add Passenger</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add Passenger to Trip</h4>
+                        <a href="{% url 'trip_detail' pk=trip.id %}" class="btn btn-sm btn-light">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Trip
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Trip information card -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title border-bottom pb-2 mb-3">Trip Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-map-marker-alt text-primary me-2"></i>Destination:</strong> 
+                                        {{ trip.destination }}
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-calendar-alt text-primary me-2"></i>Departure:</strong> 
+                                        {{ trip.departure_time|date:"F j, Y, g:i a" }}
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-bus text-primary me-2"></i>Vehicle:</strong> 
+                                        {{ trip.vehicle.plate_number }} ({{ trip.vehicle.get_vehicle_type_display }})
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-users text-primary me-2"></i>Passengers:</strong> 
+                                        <span class="{% if trip.total_passengers >= trip.vehicle.capacity %}text-danger{% endif %}">
+                                            {{ trip.total_passengers }} / {{ trip.vehicle.capacity }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if trip.total_passengers >= trip.vehicle.capacity %}
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <div>
+                            <strong>Warning:</strong> This vehicle is at full capacity. Adding more passengers may exceed the vehicle's capacity.
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Passenger form -->
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="id_passenger" class="form-label fw-bold">Select Passenger:</label>
+                                {{ form.passenger }}
+                                {% if form.passenger.errors %}
+                                <div class="text-danger mt-1 small">{{ form.passenger.errors }}</div>
+                                {% endif %}
+                                <div class="form-text">Select a passenger to add to this trip</div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="id_seat_number" class="form-label fw-bold">Seat Number:</label>
+                                {{ form.seat_number }}
+                                {% if form.seat_number.errors %}
+                                <div class="text-danger mt-1 small">{{ form.seat_number.errors }}</div>
+                                {% endif %}
+                                <div class="form-text">Optional seat assignment</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                            <a href="{% url 'trip_detail' pk=trip.id %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                            <div>
+                                <button type="submit" name="add_another" class="btn btn-outline-primary me-2">
+                                    <i class="fas fa-plus-circle me-1"></i> Add & Continue
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-user-plus me-1"></i> Add Passenger
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Quick help card -->
+            <div class="card mt-4 border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Quick Help</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Select a passenger from the dropdown list</li>
+                        <li>Optionally assign a seat number</li>
+                        <li>Click "Add Passenger" to add and return to trip details</li>
+                        <li>Click "Add & Continue" to add and add another passenger</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add Bootstrap form classes if not already added
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!document.getElementById('id_passenger').classList.contains('form-select')) {
+            document.getElementById('id_passenger').classList.add('form-select');
+        }
+        
+        if (!document.getElementById('id_seat_number').classList.contains('form-control')) {
+            document.getElementById('id_seat_number').classList.add('form-control');
+        }
+    });
+</script>
+{% endblock %}

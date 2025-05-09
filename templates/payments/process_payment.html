@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Process Payment - Government Transport Enterprise{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded shadow-md">
+    <h1 class="text-2xl font-bold mb-6 text-green-700">Process Payment</h1>
+    
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-2">Trip Details</h2>
+        <p><span class="text-gray-600">Destination:</span> {{ payment.trip.destination }}</p>
+        <p><span class="text-gray-600">Departure Time:</span> {{ payment.trip.departure_time|date:"F j, Y, g:i a" }}</p>
+        <p><span class="text-gray-600">Vehicle:</span> {{ payment.trip.vehicle.plate_number }}</p>
+        <p><span class="text-gray-600">Total Passengers:</span> {{ payment.trip.total_passengers }}</p>
+    </div>
+    
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-2">Payment Details</h2>
+        <p><span class="text-gray-600">Amount:</span> <span class="text-xl font-bold text-green-700">₦{{ payment.amount|floatformat:2 }}</span></p>
+        <p><span class="text-gray-600">Reference:</span> {{ payment.reference }}</p>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold mb-2">Select Payment Method</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <input type="radio" name="payment_method" id="cash" value="cash" class="hidden peer" checked>
+                    <label for="cash" class="block p-4 border rounded-lg text-center cursor-pointer peer-checked:border-green-500 peer-checked:bg-green-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Cash
+                    </label>
+                </div>
+                
+                <div>
+                    <input type="radio" name="payment_method" id="bank_transfer" value="bank_transfer" class="hidden peer">
+                    <label for="bank_transfer" class="block p-4 border rounded-lg text-center cursor-pointer peer-checked:border-green-500 peer-checked:bg-green-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                        </svg>
+                        Bank Transfer
+                    </label>
+                </div>
+                
+                <div>
+                    <input type="radio" name="payment_method" id="card" value="card" class="hidden peer">
+                    <label for="card" class="block p-4 border rounded-lg text-center cursor-pointer peer-checked:border-green-500 peer-checked:bg-green-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                        Card Payment
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-between">
+            <a href="{% url 'trip_detail' pk=payment.trip.id %}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400">Cancel</a>
+            <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Complete Payment</button>  class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Complete Payment</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

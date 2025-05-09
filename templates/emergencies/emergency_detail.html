@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Details - Government Transport Enterprise{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-6 rounded shadow-md">
+    <div class="flex justify-between items-start mb-6">
+        <h1 class="text-2xl font-bold text-red-700">Emergency Report</h1>
+        <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full 
+            {% if emergency.status == 'reported' %}bg-red-100 text-red-800
+            {% elif emergency.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+            {% else %}bg-green-100 text-green-800{% endif %}">
+            {{ emergency.get_status_display }}
+        </span>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+            <h2 class="text-lg font-semibold mb-2">Emergency Details</h2>
+            <p><span class="text-gray-600">Type:</span> {{ emergency.get_emergency_type_display }}</p>
+            <p><span class="text-gray-600">Location:</span> {{ emergency.location }}</p>
+            <p><span class="text-gray-600">Reported:</span> {{ emergency.reported_time|date:"F j, Y, g:i a" }}</p>
+        </div>
+        
+        <div>
+            <h2 class="text-lg font-semibold mb-2">Trip Information</h2>
+            <p><span class="text-gray-600">Destination:</span> {{ emergency.trip.destination }}</p>
+            <p><span class="text-gray-600">Departure Time:</span> {{ emergency.trip.departure_time|date:"F j, Y, g:i a" }}</p>
+            <p><span class="text-gray-600">Vehicle:</span> {{ emergency.trip.vehicle.plate_number }}</p>
+            <p><span class="text-gray-600">Passengers:</span> {{ emergency.trip.total_passengers }}</p>
+        </div>
+    </div>
+    
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-2">Description</h2>
+        <div class="bg-gray-50 p-4 rounded">
+            <p>{{ emergency.description }}</p>
+        </div>
+    </div>
+    
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-2">Status Updates</h2>
+        {% if emergency.status == 'reported' %}
+            <div class="bg-red-50 border-l-4 border-red-500 p-4">
+                <p class="text-red-700">Emergency has been reported. Authorities have been notified and will respond shortly.</p>
+            </div>
+        {% elif emergency.status == 'in_progress' %}
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+                <p class="text-yellow-700">Emergency response is in progress. Authorities are working to resolve the situation.</p>
+            </div>
+        {% else %}
+            <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                <p class="text-green-700">Emergency has been resolved. Thank you for your cooperation.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="flex justify-between">
+        <a href="{% url 'emergency_list' %}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400">
+            Back to Emergencies
+        </a>
+        
+        <a href="{% url 'trip_detail' pk=emergency.trip.id %}" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+            View Trip Details
+        </a>
+    </div>
+</div>
+{% endblock %}

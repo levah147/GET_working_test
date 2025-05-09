@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Monitoring - Government Transport Enterprise{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-red-700">Emergency Monitoring</h1>
+        </div>
+        
+        <!-- Filter Options -->
+        <div class="mb-6">
+            <div class="flex flex-wrap gap-2">
+                <a href="{% url 'admin_emergency_monitoring' %}" class="px-4 py-2 rounded-full {% if status == 'all' %}bg-red-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+                    All
+                </a>
+                <a href="{% url 'admin_emergency_monitoring' %}?status=reported" class="px-4 py-2 rounded-full {% if status == 'reported' %}bg-red-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+                    Reported
+                </a>
+                <a href="{% url 'admin_emergency_monitoring' %}?status=in_progress" class="px-4 py-2 rounded-full {% if status == 'in_progress' %}bg-red-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+                    In Progress
+                </a>
+                <a href="{% url 'admin_emergency_monitoring' %}?status=resolved" class="px-4 py-2 rounded-full {% if status == 'resolved' %}bg-red-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+                    Resolved
+                </a>
+            </div>
+        </div>
+        
+        <!-- Emergency Table -->
+        {% if emergencies %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for emergency in emergencies %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ emergency.get_emergency_type_display }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ emergency.trip.company.name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ emergency.location }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ emergency.reported_time|date:"M d, Y H:i" }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {% if emergency.status == 'reported' %}bg-red-100 text-red-800
+                                        {% elif emergency.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                                        {% else %}bg-green-100 text-green-800{% endif %}">
+                                        {{ emergency.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <a href="{% url 'emergency_detail_admin' emergency.id %}" class="text-blue-600 hover:text-blue-900">View Details</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-8">
+                <p class="text-gray-500">No emergencies found{% if status != 'all' %} with status "{{ status }}"{% endif %}.</p>
+                {% if status != 'all' %}
+                    <a href="{% url 'admin_emergency_monitoring' %}" class="text-red-600 hover:underline mt-2 inline-block">View all emergencies</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

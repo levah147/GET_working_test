@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Report Emergency - Government Transport Enterprise{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded shadow-md">
+    <h1 class="text-2xl font-bold mb-6 text-red-700">Report Emergency</h1>
+    
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-red-700">
+                    Use this form to report emergencies such as accidents, vehicle breakdowns, or medical emergencies.
+                    Authorities will be notified immediately.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <label for="trip" class="block text-sm font-medium text-gray-700">Select Trip</label>
+                <select name="trip" id="trip" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50" required>
+                    <option value="">Select a trip</option>
+                    {% for trip in active_trips %}
+                        <option value="{{ trip.id }}">{{ trip.destination }} - {{ trip.departure_time|date:"M d, Y H:i" }}</option>
+                    {% endfor %}
+                </select>
+                {% if not active_trips %}
+                    <p class="text-yellow-600 text-xs mt-1">No active trips found. Only ongoing trips can be reported for emergencies.</p>
+                {% endif %}
+            </div>
+            
+            <div class="space-y-2">
+                <label for="{{ form.emergency_type.id_for_label }}" class="block text-sm font-medium text-gray-700">Emergency Type</label>
+                {{ form.emergency_type }}
+                {% if form.emergency_type.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.emergency_type.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="space-y-2">
+                <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700">Location</label>
+                {{ form.location }}
+                {% if form.location.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.location.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="space-y-2">
+                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700">Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-between">
+            <a href="{% url 'company_dashboard' %}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400">Cancel</a>
+            <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700">Report Emergency</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

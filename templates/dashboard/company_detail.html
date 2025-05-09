@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ company.name }} - Company Details - Government Transport Enterprise{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Company Header -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-2xl font-bold text-blue-700">{{ company.name }}</h1>
+                <p class="text-gray-600">Registration Number: {{ company.registration_number }}</p>
+                <div class="mt-2 space-y-1">
+                    <p><span class="text-gray-600">Contact Person:</span> {{ company.contact_person }}</p>
+                    <p><span class="text-gray-600">Email:</span> {{ company.user.email }}</p>
+                    <p><span class="text-gray-600">Phone:</span> {{ company.phone_number }}</p>
+                    <p><span class="text-gray-600">Address:</span> {{ company.address }}</p>
+                    <p><span class="text-gray-600">Registered:</span> {{ company.registration_date|date:"F j, Y" }}</p>
+                </div>
+            </div>
+            <div>
+                <a href="{% url 'admin_company_list' %}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400">
+                    Back to Companies
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Company Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-blue-500">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-sm text-gray-500">Total Vehicles</p>
+                    <p class="text-2xl font-bold">{{ total_vehicles }}</p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m-8 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-green-500">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-sm text-gray-500">Total Trips</p>
+                    <p class="text-2xl font-bold">{{ total_trips }}</p>
+                </div>
+                <div class="bg-green-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-purple-500">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-sm text-gray-500">Trips This Month</p>
+                    <p class="text-2xl font-bold">{{ monthly_trips }}</p>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Trips -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4">Recent Trips</h2>
+        
+        {% if recent_trips %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure Time</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Passengers</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for trip in recent_trips %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ trip.destination }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ trip.departure_time|date:"M d, Y H:i" }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ trip.vehicle.plate_number }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ trip.total_passengers }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {% if trip.is_completed %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                        {{ trip.is_completed|yesno:"Completed,Pending" }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-gray-500">No trips found for this company.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Recent Emergencies -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4">Recent Emergencies</h2>
+        
+        {% if recent_emergencies %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for emergency in recent_emergencies %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ emergency.get_emergency_type_display }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ emergency.location }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ emergency.reported_time|date:"M d, Y H:i" }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {% if emergency.status == 'reported' %}bg-red-100 text-red-800
+                                        {% elif emergency.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                                        {% else %}bg-green-100 text-green-800{% endif %}">
+                                        {{ emergency.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <a href="{% url 'emergency_detail_admin' emergency.id %}" class="text-blue-600 hover:text-blue-900">View Details</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-gray-500">No emergencies reported by this company.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

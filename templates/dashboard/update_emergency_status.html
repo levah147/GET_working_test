@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Emergency Status - Government Transport Enterprise{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded shadow-md">
+    <h1 class="text-2xl font-bold mb-6 text-red-700">Update Emergency Status</h1>
+    
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-2">Emergency Details</h2>
+        <p><span class="text-gray-600">Type:</span> {{ emergency.get_emergency_type_display }}</p>
+        <p><span class="text-gray-600">Location:</span> {{ emergency.location }}</p>
+        <p><span class="text-gray-600">Reported:</span> {{ emergency.reported_time|date:"F j, Y, g:i a" }}</p>
+        <p><span class="text-gray-600">Company:</span> {{ emergency.trip.company.name }}</p>
+        <p><span class="text-gray-600">Current Status:</span> 
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                {% if emergency.status == 'reported' %}bg-red-100 text-red-800
+                {% elif emergency.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                {% else %}bg-green-100 text-green-800{% endif %}">
+                {{ emergency.get_status_display }}
+            </span>
+        </p>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold mb-2">Select New Status</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <input type="radio" name="status" id="reported" value="reported" class="hidden peer" {% if emergency.status == 'reported' %}checked{% endif %}>
+                    <label for="reported" class="block p-4 border rounded-lg text-center cursor-pointer peer-checked:border-red-500 peer-checked:bg-red-50">
+                        <div class="bg-red-100 p-2 rounded-full w-10 h-10 flex items-center justify-center mx-auto mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        Reported
+                    </label>
+                </div>
+                
+                <div>
+                    <input type="radio" name="status" id="in_progress" value="in_progress" class="hidden peer" {% if emergency.status == 'in_progress' %}checked{% endif %}>
+                    <label for="in_progress" class="block p-4 border rounded-lg text-center cursor-pointer peer-checked:border-yellow-500 peer-checked:bg-yellow-50">
+                        <div class="bg-yellow-100 p-2 rounded-full w-10 h-10 flex items-center justify-center mx-auto mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        In Progress
+                    </label>
+                </div>
+                
+                <div>
+                    <input type="radio" name="status" id="resolved" value="resolved" class="hidden peer" {% if emergency.status == 'resolved' %}checked{% endif %}>
+                    <label for="resolved" class="block p-4 border rounded-lg text-center cursor-pointer peer-checked:border-green-500 peer-checked:bg-green-50">
+                        <div class="bg-green-100 p-2 rounded-full w-10 h-10 flex items-center justify-center mx-auto mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        Resolved
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-between">
+            <a href="{% url 'emergency_detail_admin' emergency.id %}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400">Cancel</a>
+            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Update Status</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Trip Details - Government Transport Enterprise{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Trip Header -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-2xl font-bold text-green-700">Trip to {{ trip.destination }}</h1>
+                <p class="text-gray-600">{{ trip.departure_time|date:"F j, Y, g:i a" }}</p>
+                <div class="mt-2">
+                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full 
+                        {% if trip.is_completed %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                        {{ trip.is_completed|yesno:"Completed,Pending" }}
+                    </span>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-gray-500">Vehicle</p>
+                <p class="font-semibold">{{ trip.vehicle.plate_number }}</p>
+                <p class="text-sm text-gray-500 mt-2">Capacity</p>
+                <p class="font-semibold">{{ trip.vehicle.capacity }} passengers</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Passenger List -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-semibold">Passengers ({{ trip_passengers.count }})</h2>
+            <div>
+                <a href="{% url 'add_passenger_to_trip' trip.id %}" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
+                    Add Passenger
+                </a>
+            </div>
+        </div>
+        
+        {% if trip_passengers %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next of Kin</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Seat Number</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for trip_passenger in trip_passengers %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ trip_passenger.passenger.full_name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ trip_passenger.passenger.phone_number }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ trip_passenger.passenger.next_of_kin }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ trip_passenger.seat_number|default:"-" }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <a href="{% url 'passenger_detail' trip_passenger.passenger.id %}" class="text-green-600 hover:text-green-900">View Details</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-8">
+                <p class="text-gray-500">No passengers added to this trip yet.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Payment Information -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4">Payment Information</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <p class="text-sm text-gray-500">Fee Per Passenger</p>
+                <p class="text-xl font-bold">₦{{ trip.fee_per_passenger|floatformat:2 }}</p>
+                
+                <p class="text-sm text-gray-500 mt-4">Total Passengers</p>
+                <p class="text-xl font-bold">{{ trip.total_passengers }}</p>
+                
+                <p class="text-sm text-gray-500 mt-4">Total Amount</p>
+                <p class="text-2xl font-bold text-green-700">₦{{ trip.total_fee|floatformat:2 }}</p>
+            </div>
+            
+            <div>
+                {% if payment %}
+                    <p class="text-sm text-gray-500">Payment Status</p>
+                    <p class="text-xl font-bold 
+                        {% if payment.payment_status == 'completed' %}text-green-600
+                        {% elif payment.payment_status == 'pending' %}text-yellow-600
+                        {% else %}text-red-600{% endif %}">
+                        {{ payment.get_payment_status_display }}
+                    </p>
+                    
+                    <p class="text-sm text-gray-500 mt-4">Payment Method</p>
+                    <p class="text-xl font-bold">{{ payment.get_payment_method_display }}</p>
+                    
+                    <p class="text-sm text-gray-500 mt-4">Reference</p>
+                    <p class="text-xl font-bold">{{ payment.reference }}</p>
+                    
+                    {% if payment.payment_status == 'pending' %}
+                        <div class="mt-4">
+                            <a href="{% url 'process_payment' payment.id %}" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
+                                Process Payment
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {% if trip.is_completed %}
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-yellow-700">
+                                        No payment record found for this trip.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="bg-gray-50 border-l-4 border-gray-400 p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-700">
+                                        Payment will be created when the trip is marked as completed.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="flex justify-between">
+        <a href="{% url 'trip_list' %}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400">
+            Back to Trips
+        </a>
+        
+        {% if not trip.is_completed %}
+            <form method="post" action="{% url 'complete_trip' trip.id %}">
+                {% csrf_token %}
+                <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
+                    Mark as Completed
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

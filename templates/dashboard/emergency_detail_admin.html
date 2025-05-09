@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Details - Government Transport Enterprise{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-6 rounded shadow-md">
+    <div class="flex justify-between items-start mb-6">
+        <h1 class="text-2xl font-bold text-red-700">Emergency Report</h1>
+        <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full 
+            {% if emergency.status == 'reported' %}bg-red-100 text-red-800
+            {% elif emergency.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+            {% else %}bg-green-100 text-green-800{% endif %}">
+            {{ emergency.get_status_display }}
+        </span>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+            <h2 class="text-lg font-semibold mb-2">Emergency Details</h2>
+            <p><span class="text-gray-600">Type:</span> {{ emergency.get_emergency_type_display }}</p>
+            <p><span class="text-gray-600">Location:</span> {{ emergency.location }}</p>
+            <p><span class="text-gray-600">Reported:</span> {{ emergency.reported_time|date:"F j, Y, g:i a" }}</p>
+        </div>
+        
+        <div>
+            <h2 class="text-lg font-semibold mb-2">Company Information</h2>
+            <p><span class="text-gray-600">Company:</span> {{ emergency.trip.company.name }}</p>
+            <p><span class="text-gray-600">Contact Person:</span> {{ emergency.trip.company.contact_person }}</p>
+            <p><span class="text-gray-600">Phone:</span> {{ emergency.trip.company.phone_number }}</p>
+            <a href="{% url 'admin_company_detail' emergency.trip.company.id %}" class="text-blue-600 hover:underline mt-2 inline-block">View Company Details</a>
+        </div>
+    </div>
+    
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-2">Trip Information</h2>
+        <p><span class="text-gray-600">Destination:</span> {{ emergency.trip.destination }}</p>
+        <p><span class="text-gray-600">Departure Time:</span> {{ emergency.trip.departure_time|date:"F j, Y, g:i a" }}</p>
+        <p><span class="text-gray-600">Vehicle:</span> {{ emergency.trip.vehicle.plate_number }}</p>
+        <p><span class="text-gray-600">Passengers:</span> {{ emergency.trip.total_passengers }}</p>
+    </div>
+    
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-2">Description</h2>
+        <div class="bg-gray-50 p-4 rounded">
+            <p>{{ emergency.description }}</p>
+        </div>
+    </div>
+    
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-2">Update Status</h2>
+        <form method="post" action="{% url 'update_emergency_status' emergency.id %}">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <input type="radio" name="status" id="reported" value="reported" class="hidden peer" {% if emergency.status == 'reported' %}checked{% endif %}>
+                    <label for="reported" class="block p-4 border rounded-lg text-center cursor-pointer peer-checked:border-red-500 peer-checked:bg-red-50">
+                        <div class="bg-red-100 p-2 rounded-full w-10 h-10 flex items-center justify-center mx-auto mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        Reported
+                    </label>
+                </div>
+                
+                <div>
+                    <input type="radio" name="status" id="in_progress" value="in_progress" class="hidden peer" {% if emergency.status == 'in_progress' %}checked{% endif %}>
+                    <label for="in_progress" class="block p-4 border rounded-lg text-center cursor-pointer peer-checked:border-yellow-500 peer-checked:bg-yellow-50">
+                        <div class="bg-yellow-100 p-2 rounded-full w-10 h-10 flex items-center justify-center mx-auto mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        In Progress
+                    </label>
+                </div>
+                
+                <div>
+                    <input type="radio" name="status" id="resolved" value="resolved" class="hidden peer" {% if emergency.status == 'resolved' %}checked{% endif %}>
+                    <label for="resolved" class="block p-4 border rounded-lg text-center cursor-pointer peer-checked:border-green-500 peer-checked:bg-green-50">
+                        <div class="bg-green-100 p-2 rounded-full w-10 h-10 flex items-center justify-center mx-auto mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        Resolved
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                Update Status
+            </button>
+        </form>
+    </div>
+    
+    <div class="flex justify-between">
+        <a href="{% url 'admin_emergency_monitoring' %}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400">
+            Back to Emergencies
+        </a>
+        
+        <a href="#" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+            Contact Company
+        </a>
+    </div>
+</div>
+{% endblock %}

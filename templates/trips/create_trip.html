@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Trip - Government Transport Enterprise{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded shadow-md">
+    <h1 class="text-2xl font-bold mb-6 text-green-700">Create New Trip</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <label for="{{ form.vehicle.id_for_label }}" class="block text-sm font-medium text-gray-700">Vehicle</label>
+                {{ form.vehicle }}
+                {% if form.vehicle.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.vehicle.errors.0 }}</p>
+                {% endif %}
+                {% if not form.vehicle.field.queryset.exists %}
+                    <p class="text-yellow-600 text-xs mt-1">No vehicles available. <a href="{% url 'add_vehicle' %}" class="underline">Add a vehicle</a> first.</p>
+                {% endif %}
+            </div>
+            
+            <div class="space-y-2">
+                <label for="{{ form.destination.id_for_label }}" class="block text-sm font-medium text-gray-700">Destination</label>
+                {{ form.destination }}
+                {% if form.destination.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.destination.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="space-y-2">
+                <label for="{{ form.departure_time.id_for_label }}" class="block text-sm font-medium text-gray-700">Departure Time</label>
+                {{ form.departure_time }}
+                {% if form.departure_time.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.departure_time.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="space-y-2">
+                <label for="{{ form.fee_per_passenger.id_for_label }}" class="block text-sm font-medium text-gray-700">Fee Per Passenger (₦)</label>
+                {{ form.fee_per_passenger }}
+                {% if form.fee_per_passenger.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.fee_per_passenger.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-between">
+            <a href="{% url 'company_dashboard' %}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400">Cancel</a>
+            <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Create Trip</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
